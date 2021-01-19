@@ -52,7 +52,17 @@ class PhotosViewController: UICollectionViewController {
   // MARK: View Controller
   override func viewDidLoad() {
     super.viewDidLoad()
-
+    let authorized = PHPhotoLibrary.authorized.share()
+    
+    authorized
+        .skipWhile { $0 == false }
+        .take(1)
+        .subscribe(onNext: { [weak self] _ in
+            self?.photos = PhotosViewController.loadPhotos()
+            DispatchQueue.main.async {
+            self?.collectionView?.reloadData()
+            }
+        }).disposed(by: bag)
   }
 
   override func viewWillDisappear(_ animated: Bool) {

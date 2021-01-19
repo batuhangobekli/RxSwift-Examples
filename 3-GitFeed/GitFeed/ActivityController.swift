@@ -32,11 +32,15 @@ class ActivityController: UITableViewController {
     
     fileprivate let events = BehaviorRelay<[Event]>(value: [])
     fileprivate let bag = DisposeBag()
-    
+    private var eventsFileURL:URL{
+        return cachedFileURL("events.plist")
+    }
+        
     override func viewDidLoad() {
         super.viewDidLoad()
         title = repo
         
+       
         self.refreshControl = UIRefreshControl()
         let refreshControl = self.refreshControl!
         
@@ -44,6 +48,9 @@ class ActivityController: UITableViewController {
         refreshControl.tintColor = UIColor.darkGray
         refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh")
         refreshControl.addTarget(self, action: #selector(refresh), for: .valueChanged)
+                
+        let eventsArray = (NSArray(contentsOf: eventsFileURL) as? [[String: Any]]) ?? []
+        events.accept(eventsArray.compactMap(Event.init))
         
         refresh()
     }
@@ -79,6 +86,10 @@ class ActivityController: UITableViewController {
         }).disposed(by:bag)
     }
     
+    func cachedFileURL(_ fileName: String) -> URL {
+        return FileManager.default.urls(for: .cachesDirectory, in: .allDomainsMask) .first!.appendingPathComponent(fileName)
+    }
+    
     func processEvents(_ newEvents: [Event]) {
         var updatedEvents = newEvents + events.value
         if updatedEvents.count > 50 {
@@ -89,6 +100,8 @@ class ActivityController: UITableViewController {
             self.tableView.reloadData()
             self.refreshControl?.endRefreshing()
         }
+        let eventsArray = updatedEvents.map{ $0.dictionary } as NSArray
+        eventsArray.write(to: eventsFileURL, atomically: true)
     }
     
     // MARK: - Table Data Source

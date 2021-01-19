@@ -73,7 +73,7 @@ class ActivityController: UITableViewController {
             return 200..<300 ~= response.statusCode
         }.map { _, data -> [[String: Any]] in
             guard let jsonObject = try? JSONSerialization.jsonObject(with: data, options: []),
-                  let result = jsonObject as? [[String: Any]] else {
+                let result = jsonObject as? [[String: Any]] else {
                 return []
             }
             return result

@@ -25,11 +25,12 @@ import RxSwift
 import RxCocoa
 import Kingfisher
 
+
 class ActivityController: UITableViewController {
 
   let repo = "ReactiveX/RxSwift"
 
-  fileprivate let events = Variable<[Event]>([])
+  fileprivate let events = BehaviorRelay<[Event]>(value: [])
   fileprivate let bag = DisposeBag()
 
   override func viewDidLoad() {
@@ -47,7 +48,7 @@ class ActivityController: UITableViewController {
     refresh()
   }
 
-  func refresh() {
+    @objc func refresh() {
     fetchEvents(repo: repo)
   }
 

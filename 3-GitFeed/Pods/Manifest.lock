@@ -1,0 +1,19 @@
+PODS:
+  - Kingfisher (3.2.2)
+  - RxCocoa (3.0.1):
+    - RxSwift (~> 3.0)
+  - RxSwift (3.0.1)
+
+DEPENDENCIES:
+  - Kingfisher (= 3.2.2)
+  - RxCocoa (= 3.0.1)
+  - RxSwift (= 3.0.1)
+
+SPEC CHECKSUMS:
+  Kingfisher: 821466474ad7ffc375a4aecadfa05068cfed67b3
+  RxCocoa: 15a52fc590dcc700cb4a690a633b5c5184ce3a78
+  RxSwift: af5680055c4ad04480189c52d28385b1029493a6
+
+PODFILE CHECKSUM: cb92aabe3813449412989371aed2db6ea5c6c031
+
+COCOAPODS: 1.2.0

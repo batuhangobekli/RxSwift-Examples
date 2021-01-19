@@ -7,9 +7,8 @@
 //
 
 import Foundation
-#if !RX_NO_MODULE
+
 import RxSwift
-#endif
 
 class RxTarget : NSObject
                , Disposable {
@@ -25,13 +24,13 @@ class RxTarget : NSObject
 #endif
 
 #if DEBUG
-        MainScheduler.ensureExecutingOnScheduler()
+        MainScheduler.ensureRunningOnMainThread()
 #endif
     }
     
     func dispose() {
 #if DEBUG
-        MainScheduler.ensureExecutingOnScheduler()
+        MainScheduler.ensureRunningOnMainThread()
 #endif
         self.retainSelf = nil
     }

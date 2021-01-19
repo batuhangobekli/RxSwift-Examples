@@ -6,15 +6,13 @@
 //  Copyright © 2015 Krunoslav Zaher. All rights reserved.
 //
 
-import Foundation
-
-/// Type that can be converted to observable sequence (`Observer<E>`).
+/// Type that can be converted to observable sequence (`Observable<Element>`).
 public protocol ObservableConvertibleType {
     /// Type of elements in sequence.
-    associatedtype E
+    associatedtype Element
 
     /// Converts `self` to `Observable` sequence.
     ///
     /// - returns: Observable sequence that represents `self`.
-    func asObservable() -> Observable<E>
+    func asObservable() -> Observable<Element>
 }

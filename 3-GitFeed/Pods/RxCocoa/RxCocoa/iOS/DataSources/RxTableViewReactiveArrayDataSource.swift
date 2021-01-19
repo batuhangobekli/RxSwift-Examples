@@ -8,11 +8,8 @@
 
 #if os(iOS) || os(tvOS)
 
-import Foundation
 import UIKit
-#if !RX_NO_MODULE
 import RxSwift
-#endif
 
 // objc monkey business
 class _RxTableViewReactiveArrayDataSource
@@ -20,15 +17,15 @@ class _RxTableViewReactiveArrayDataSource
     , UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
+        1
     }
    
     func _tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 0
+        0
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return _tableView(tableView, numberOfRowsInSection: section)
+        _tableView(tableView, numberOfRowsInSection: section)
     }
 
     fileprivate func _tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -36,22 +33,22 @@ class _RxTableViewReactiveArrayDataSource
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        return _tableView(tableView, cellForRowAt: indexPath)
+        _tableView(tableView, cellForRowAt: indexPath)
     }
 }
 
 
-class RxTableViewReactiveArrayDataSourceSequenceWrapper<S: Sequence>
-    : RxTableViewReactiveArrayDataSource<S.Iterator.Element>
+class RxTableViewReactiveArrayDataSourceSequenceWrapper<Sequence: Swift.Sequence>
+    : RxTableViewReactiveArrayDataSource<Sequence.Element>
     , RxTableViewDataSourceType {
-    typealias Element = S
+    typealias Element = Sequence
 
     override init(cellFactory: @escaping CellFactory) {
         super.init(cellFactory: cellFactory)
     }
 
-    func tableView(_ tableView: UITableView, observedEvent: Event<S>) {
-        UIBindingObserver(UIElement: self) { tableViewDataSource, sectionModels in
+    func tableView(_ tableView: UITableView, observedEvent: Event<Sequence>) {
+        Binder(self) { tableViewDataSource, sectionModels in
             let sections = Array(sectionModels)
             tableViewDataSource.tableView(tableView, observedElements: sections)
         }.on(observedEvent)
@@ -64,10 +61,10 @@ class RxTableViewReactiveArrayDataSource<Element>
     , SectionedViewDataSourceType {
     typealias CellFactory = (UITableView, Int, Element) -> UITableViewCell
     
-    var itemModels: [Element]? = nil
+    var itemModels: [Element]?
     
     func modelAtIndex(_ index: Int) -> Element? {
-        return itemModels?[index]
+        itemModels?[index]
     }
 
     func model(at indexPath: IndexPath) throws -> Any {
@@ -85,11 +82,11 @@ class RxTableViewReactiveArrayDataSource<Element>
     }
     
     override func _tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return itemModels?.count ?? 0
+        itemModels?.count ?? 0
     }
     
     override func _tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        return cellFactory(tableView, indexPath.item, itemModels![indexPath.row])
+        cellFactory(tableView, indexPath.item, itemModels![indexPath.row])
     }
     
     // reactive

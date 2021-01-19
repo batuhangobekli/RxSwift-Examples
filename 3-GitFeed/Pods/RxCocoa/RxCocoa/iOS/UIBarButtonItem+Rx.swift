@@ -9,35 +9,25 @@
 #if os(iOS) || os(tvOS)
 
 import UIKit
-#if !RX_NO_MODULE
 import RxSwift
-#endif
 
-fileprivate var rx_tap_key: UInt8 = 0
+private var rx_tap_key: UInt8 = 0
 
 extension Reactive where Base: UIBarButtonItem {
-    
-    /// Bindable sink for `enabled` property.
-    public var isEnabled: UIBindingObserver<Base, Bool> {
-        return UIBindingObserver(UIElement: self.base) { UIElement, value in
-            UIElement.isEnabled = value
-        }
-    }
-
     /// Reactive wrapper for target action pattern on `self`.
-    public var tap: ControlEvent<Void> {
-        let source = lazyInstanceObservable(&rx_tap_key) { () -> Observable<Void> in
+    public var tap: ControlEvent<()> {
+        let source = lazyInstanceObservable(&rx_tap_key) { () -> Observable<()> in
             Observable.create { [weak control = self.base] observer in
                 guard let control = control else {
                     observer.on(.completed)
                     return Disposables.create()
                 }
                 let target = BarButtonItemTarget(barButtonItem: control) {
-                    observer.on(.next())
+                    observer.on(.next(()))
                 }
                 return target
             }
-            .takeUntil(self.deallocated)
+            .take(until: self.deallocated)
             .share()
         }
         
@@ -47,7 +37,7 @@ extension Reactive where Base: UIBarButtonItem {
 
 
 @objc
-class BarButtonItemTarget: RxTarget {
+final class BarButtonItemTarget: RxTarget {
     typealias Callback = () -> Void
     
     weak var barButtonItem: UIBarButtonItem?
@@ -64,7 +54,7 @@ class BarButtonItemTarget: RxTarget {
     override func dispose() {
         super.dispose()
 #if DEBUG
-        MainScheduler.ensureExecutingOnScheduler()
+        MainScheduler.ensureRunningOnMainThread()
 #endif
         
         barButtonItem?.target = nil
@@ -73,7 +63,7 @@ class BarButtonItemTarget: RxTarget {
         callback = nil
     }
     
-    func action(_ sender: AnyObject) {
+    @objc func action(_ sender: AnyObject) {
         callback()
     }
     

@@ -6,8 +6,8 @@
 //  Copyright © 2015 Krunoslav Zaher. All rights reserved.
 //
 
-import Foundation
 import Dispatch
+import Foundation
 
 /**
 Abstracts work that needs to be performed on `MainThread`. In case `schedule` methods are called from main thread, it will perform action immediately without scheduling.
@@ -19,24 +19,24 @@ public final class ConcurrentMainScheduler : SchedulerType {
     public typealias TimeInterval = Foundation.TimeInterval
     public typealias Time = Date
 
-    private let _mainScheduler: MainScheduler
-    private let _mainQueue: DispatchQueue
+    private let mainScheduler: MainScheduler
+    private let mainQueue: DispatchQueue
 
     /// - returns: Current time.
-    public var now : Date {
-        return _mainScheduler.now as Date
+    public var now: Date {
+        self.mainScheduler.now as Date
     }
 
     private init(mainScheduler: MainScheduler) {
-        _mainQueue = DispatchQueue.main
-        _mainScheduler = mainScheduler
+        self.mainQueue = DispatchQueue.main
+        self.mainScheduler = mainScheduler
     }
 
     /// Singleton instance of `ConcurrentMainScheduler`
     public static let instance = ConcurrentMainScheduler(mainScheduler: MainScheduler.instance)
 
     /**
-    Schedules an action to be executed immediatelly.
+    Schedules an action to be executed immediately.
 
     - parameter state: State passed to the action to be executed.
     - parameter action: Action to be executed.
@@ -49,7 +49,7 @@ public final class ConcurrentMainScheduler : SchedulerType {
 
         let cancel = SingleAssignmentDisposable()
 
-        _mainQueue.async {
+        self.mainQueue.async {
             if cancel.isDisposed {
                 return
             }
@@ -68,8 +68,8 @@ public final class ConcurrentMainScheduler : SchedulerType {
     - parameter action: Action to be executed.
     - returns: The disposable object used to cancel the scheduled action (best effort).
     */
-    public final func scheduleRelative<StateType>(_ state: StateType, dueTime: Foundation.TimeInterval, action: @escaping (StateType) -> Disposable) -> Disposable {
-        return _mainScheduler.scheduleRelative(state, dueTime: dueTime, action: action)
+    public final func scheduleRelative<StateType>(_ state: StateType, dueTime: RxTimeInterval, action: @escaping (StateType) -> Disposable) -> Disposable {
+        self.mainScheduler.scheduleRelative(state, dueTime: dueTime, action: action)
     }
 
     /**
@@ -81,7 +81,7 @@ public final class ConcurrentMainScheduler : SchedulerType {
     - parameter action: Action to be executed.
     - returns: The disposable object used to cancel the scheduled action (best effort).
     */
-    public func schedulePeriodic<StateType>(_ state: StateType, startAfter: TimeInterval, period: TimeInterval, action: @escaping (StateType) -> StateType) -> Disposable {
-        return _mainScheduler.schedulePeriodic(state, startAfter: startAfter, period: period, action: action)
+    public func schedulePeriodic<StateType>(_ state: StateType, startAfter: RxTimeInterval, period: RxTimeInterval, action: @escaping (StateType) -> StateType) -> Disposable {
+        self.mainScheduler.schedulePeriodic(state, startAfter: startAfter, period: period, action: action)
     }
 }
